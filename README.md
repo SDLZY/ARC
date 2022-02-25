@@ -1,6 +1,6 @@
-# Two Processes in One Step: Jointly Answering and Explaining for Visual Commonsense Reasoning
+# Joint Answering and Explanation for Visual Commonsense Reasoning
 
-This repository contains data and PyTorch code for the paper [ Two Processes in One Step: Jointly Answering and Explaining for Visual Commonsense Reasoning]().
+This repository contains data and PyTorch code for the paper [ Joint Answering and Explanation for Visual Commonsense Reasoning]().
 
 ## Setting up and using the repo
 
