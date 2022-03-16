@@ -1,6 +1,6 @@
 # Joint Answering and Explanation for Visual Commonsense Reasoning
 
-This repository contains data and PyTorch code for the paper [ Joint Answering and Explanation for Visual Commonsense Reasoning]().
+This repository contains data and PyTorch code for the paper [ Joint Answering and Explanation for Visual Commonsense Reasoning](https://arxiv.org/abs/2202.12626).
 
 ## Setting up and using the repo
 
