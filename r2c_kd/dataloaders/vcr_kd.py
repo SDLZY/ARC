@@ -154,9 +154,8 @@ class VCR(Dataset):
             if forbidden_key in kwargs:
                 raise ValueError(f"don't supply {forbidden_key} to eval_splits()")
 
-        stuff_to_return = [cls(split='test', tasks=('1', '2'), conditioned_answer_choice=i, **kwargs) for i in range(4)]
-        # stuff_to_return = [cls(split='test', mode='answer', **kwargs)] + [
-        #     cls(split='test', mode='rationale', conditioned_answer_choice=i, **kwargs) for i in range(4)]
+        stuff_to_return = [cls(split='test', mode='answer', **kwargs)] + [
+            cls(split='test', mode='rationale', conditioned_answer_choice=i, **kwargs) for i in range(4)]
         return tuple(stuff_to_return)
 
     def __len__(self):
@@ -420,21 +419,20 @@ class VCR(Dataset):
         assert np.all((boxes[:, 2] <= w))
         assert np.all((boxes[:, 3] <= h))
         instance_dict['boxes'] = ArrayField(boxes, padding_value=-1)
-        if self.logits_qr2a or self.features_penult or self.features_last:
-            with h5py.File(self.qr2a_h5, 'r') as h5:
-                h5_i = h5[str(index)]
-                answer_label = int(np.array(h5_i['answer_label'], dtype=np.int64))
-                if self.logits_qr2a:
-                    instance_dict['logits_qr2a'] = ArrayField(np.array(h5_i['label_logits'], dtype=np.float32),
-                                                              padding_value=-1)
-                if self.features_penult:
-                    instance_dict['features_penult_qr2a'] = ArrayField(np.array(h5_i['features_penult'], dtype=np.float32),
-                                                                       padding_value=-1)
-                if self.features_last:
-                    instance_dict['features_last_qr2a'] = ArrayField(np.array(h5_i['features_last'], dtype=np.float32),
-                                                                     padding_value=-1)
-                # instance_dict['qr2a_probs'] = ArrayField(np.array(h5_i['label_probs'], dtype=np.float32), padding_value=-1)
-                assert answer_label == item['answer_label']
+        with h5py.File(self.qr2a_h5, 'r') as h5:
+            h5_i = h5[str(index)]
+            answer_label = int(np.array(h5_i['answer_label'], dtype=np.int64))
+            if self.logits_qr2a:
+                instance_dict['logits_qr2a'] = ArrayField(np.array(h5_i['label_logits'], dtype=np.float32),
+                                                          padding_value=-1)
+            if self.features_penult:
+                instance_dict['features_penult_qr2a'] = ArrayField(np.array(h5_i['features_penult'], dtype=np.float32),
+                                                                   padding_value=-1)
+            if self.features_last:
+                instance_dict['features_last_qr2a'] = ArrayField(np.array(h5_i['features_last'], dtype=np.float32),
+                                                                 padding_value=-1)
+            # instance_dict['qr2a_probs'] = ArrayField(np.array(h5_i['label_probs'], dtype=np.float32), padding_value=-1)
+            assert answer_label == item['answer_label']
 
         instance = Instance(instance_dict)
         instance.index_fields(self.vocab)

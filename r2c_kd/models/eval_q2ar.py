@@ -1,0 +1,78 @@
+"""
+You can use this script to evaluate prediction files (valpreds.npy). Essentially this is needed if you want to, say,
+combine answer and rationale predictions.
+"""
+
+import numpy as np
+import json
+import os
+from config import VCR_ANNOTS_DIR
+import argparse
+
+parser = argparse.ArgumentParser(description='Evaluate question -> answer and rationale')
+parser.add_argument(
+    '-answer_preds',
+    dest='answer_preds',
+    default='saves/flagship_answer/valpreds.npy',
+    help='Location of question->answer predictions',
+    type=str,
+)
+parser.add_argument(
+    '-rationale_preds',
+    dest='rationale_preds',
+    default='saves/flagship_rationale/valpreds.npy',
+    help='Location of question+answer->rationale predictions',
+    type=str,
+)
+parser.add_argument(
+    '-qr2a_preds',
+    dest='qr2a_preds',
+    default='saves/qr2a_pretrain/valpreds.npy',
+    type=str,
+)
+
+parser.add_argument(
+    '-split',
+    dest='split',
+    default='val',
+    help='Split you\'re using. Probably you want val.',
+    type=str,
+)
+
+args = parser.parse_args()
+
+answer_preds = np.load(args.answer_preds)
+rationale_preds = np.load(args.rationale_preds)
+qr2a_preds = np.load(args.qr2a_preds)
+
+rationale_labels = []
+answer_labels = []
+
+with open(os.path.join(VCR_ANNOTS_DIR, args.split, '{}.jsonl'.format(args.split)), 'r') as f:
+    for l in f:
+        item = json.loads(l)
+        answer_labels.append(item['answer_label'])
+        rationale_labels.append(item['rationale_label'])
+
+answer_labels = np.array(answer_labels)
+rationale_labels = np.array(rationale_labels)
+
+# Sanity checks
+assert answer_preds.shape[0] == answer_labels.size
+assert rationale_preds.shape[0] == answer_labels.size
+assert answer_preds.shape[1] == 4
+assert rationale_preds.shape[1] == 4
+
+answer_hits = answer_preds.argmax(1) == answer_labels
+rationale_hits = rationale_preds.argmax(1) == rationale_labels
+qr2a_hits = qr2a_preds.argmax(1) == answer_labels
+joint_hits = answer_hits & rationale_hits
+
+print("Answer acc:    {:.4f}".format(np.mean(answer_hits)), flush=True)
+print("Rationale acc: {:.4f}".format(np.mean(rationale_hits)), flush=True)
+print("Rationale acc cond on Correct Answer:     {:.4f}".format(np.mean(rationale_hits[answer_hits])), flush=True)
+print("Rationale acc cond on Wrong Answer:     {:.4f}".format(np.mean(rationale_hits[~answer_hits])), flush=True)
+print("Joint acc:     {:.4f}".format(np.mean(answer_hits & rationale_hits)), flush=True)
+
+index = qr2a_hits & (~answer_hits)
+print(index.mean(), rationale_hits[index].shape, rationale_hits[index].mean())

@@ -82,7 +82,7 @@ class VCR(Dataset):
         self.add_image_as_a_box = add_image_as_a_box
         self.conditioned_answer_choice = conditioned_answer_choice
 
-        with open(os.path.join(VCR_ANNOTS_DIR, split, 'vcr_synonyms.jsonl'), 'r') as f:
+        with open(os.path.join(VCR_ANNOTS_DIR, split, 'vcr_synonyms_val.jsonl'), 'r') as f:
             self.items = [json.loads(s) for s in f]
 
         if split not in ('test', 'train', 'val'):
@@ -107,11 +107,11 @@ class VCR(Dataset):
             self.h5fn_0 = os.path.join(VCR_ANNOTS_DIR, split, f'bert_qr2a_answer_{self.split}.h5')
             print("Loading embeddings from {}".format(self.h5fn_0), flush=True)
         if '1' in self.tasks:
-            self.h5fn_1 = os.path.join(VCR_ANNOTS_DIR, split, f'bert_paraphrase_answer_{self.split}.h5')
+            self.h5fn_1 = os.path.join(VCR_ANNOTS_DIR, split, f'bert_re-train-paraphrase_answer_{self.split}.h5')
             print("Loading embeddings from {}".format(self.h5fn_1), flush=True)
         if '2' in self.tasks:
             # 保证和task3的数据同分布
-            self.h5fn_2 = os.path.join(VCR_ANNOTS_DIR, split, f'bert_paraphrase_rationale_{self.split}.h5')
+            self.h5fn_2 = os.path.join(VCR_ANNOTS_DIR, split, f'bert_re-train-paraphrase_rationale_{self.split}.h5')
             # self.h5fn_2 = os.path.join(VCR_ANNOTS_DIR, split, f'{self.embs_to_load}_rationale_{self.split}2.h5')
             print("Loading embeddings from {}".format(self.h5fn_2), flush=True)
         if '3' in self.tasks:

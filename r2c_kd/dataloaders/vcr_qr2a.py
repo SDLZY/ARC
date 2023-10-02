@@ -31,7 +31,7 @@ GENDER_NEUTRAL_NAMES = ['Casey', 'Riley', 'Jessie', 'Jackie', 'Avery', 'Jaime', 
 # "objects": ["person", "person", "person", "car"],
 # "interesting_scores": [0],
 # "answer_likelihood": "possible",
-# RLIE_ST_CLOUD/3015_CHARLIE_ST_CLOUD_00.23.57.935-00.24.00.783@0.jpg",
+# "img_fn": "lsmdc_3015_CHARLIE_ST_CLOUD/3015_CHARLIE_ST_CLOUD_00.23.57.935-00.24.00.783@0.jpg",
 # "metadata_fn": "lsmdc_3015_CHARLIE_ST_CLOUD/3015_CHARLIE_ST_CLOUD_00.23.57.935-00.24.00.783@0.json",
 # "answer_orig": "No she does not",
 # "question_orig": "Does 3 feel comfortable?",
@@ -220,6 +220,9 @@ class VCR(Dataset):
         if self.mode == 'rationale':
             conditioned_label = item['answer_label'] if self.split != 'test' else self.conditioned_answer_choice
             item['question'] += item['answer_choices'][conditioned_label]
+        else:
+            conditioned_label = item['rationale_label'] if self.split != 'test' else self.conditioned_answer_choice
+            item['question'] += item['rationale_choices'][conditioned_label]
 
         answer_choices = item['{}_choices'.format(self.mode)]
         dets2use, old_det_to_new_ind = self._get_dets_to_use(item)
