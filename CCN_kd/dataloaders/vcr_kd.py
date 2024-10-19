@@ -117,7 +117,9 @@ class VCR(Dataset):
         self.features_penult = features_penult
         self.features_last = features_last
         self.logits_qr2a = logits_qr2a
-        self.qr2a_h5 = os.path.join(VCR_ANNOTS_DIR, split, f'ccn_qr2a_{self.split}.h5')
+        for task in self.tasks:
+            if task in ('1', '2'):
+                self.qr2a_h5 = os.path.join(VCR_ANNOTS_DIR, split, f'ccn_qr2a_{self.split}.h5')
 
     @property
     def is_train(self):
